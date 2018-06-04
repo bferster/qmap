@@ -10,25 +10,60 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 	<script src="lib/jquery.ui.touch-punch.min.js"></script>
 	<link REL="SHORTCUT ICON" HREF="img/qlogo.ico">
-	<title>Mandala Search</title>
+	<title>Qmap editor</title>
+<style>
+			body { 		font-family: Verdana,Geneva,sans-serif; font-size:13px; box-sizing: border-box;
+						padding: 0px; margin: 0px;
+						}
+			.menuBut {	margin-left:16px; margin-right: 16px; margin-top:8px; cursor: pointer;
+						}
+
+</style>
 </head>
+
 <body>
+<div id="mainDiv" style="width:100%;height:calc(100vh - 32px);background-color:#eee"></div>
+<div id="menuDiv" style="width:100%;height:32px;background-color:#ccc">
+	<img id="moveBut" class="menuBut" src="img/movebut.gif" onclick="SendMsg('menu','move')">
+</div>
+
 <script>
 
+var editMode=false;
+
 $(document).ready(function() {								           	// ON PAGE LOADED
+	
+	
+	
+	
 	if (window.addEventListener) 											// If supported this way
 		window.addEventListener("message",html5MessageHandler,false);		// Add event handler
 	else																	// Use other method
 		window.attachEvent("message",html5MessageHandler);					// Add handler
-
 });
 
 function html5MessageHandler(e)											// ON HTML5 MESSAGE
 {
-	if (e && e.data)														// If a valid message				
-		trace(e);														// Handle it
+	if (e && e.data) {														// If a valid message				
+		if (e.data.match(/QMap=menu/))										// A menu message
+			MenuOption(e.data.substr(10));									// Route
+		else
+			trace(e.data);														// Handle it
+		}
 }
 
+function SendMsg(type, msg)												// SEND HTML5 MESSAGE
+{
+	window.postMessage("QMap="+type+"|"+msg,"*");							// Send message to main window
+}
+
+function MenuOption(msg)												// ROUTE MENU OPTION
+{
+	if (msg == "move") {													// Move
+		editMode=!editMode;													// Toggle mode
+		$("#moveBut").prop("src", editMode ? "img/editbut.gif" : "img/movebut.gif"); // Toggle button
+		}
+}
 
 function trace(msg, p1, p2, p3, p4)										// CONSOLE 
 	{
