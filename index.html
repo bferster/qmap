@@ -15,27 +15,35 @@
 			body { 		font-family: Verdana,Geneva,sans-serif; font-size:13px; box-sizing: border-box;
 						padding: 0px; margin: 0px;
 						}
-			.menuBut {	margin-left:16px; margin-right: 16px; margin-top:8px; cursor: pointer;
+			.menuBut {	margin-left:16px; margin-top:8px; cursor: pointer;display:inline-block;
 						}
-
+			.ui-slider .ui-slider-handle { width:14px; height:14px; margin-top:-2px; 
+						background:#fff; border: 1px solid #666; border-radius:8px;
+						}
 </style>
 </head>
 
 <body>
 <div id="mainDiv" style="width:100%;height:calc(100vh - 32px);background-color:#eee"></div>
 <div id="menuDiv" style="width:100%;height:32px;background-color:#ccc">
-	<img id="moveBut" class="menuBut" src="img/movebut.gif" onclick="SendMsg('menu','move')">
+	<img id="moveBut" class="menuBut" src="img/movebut.gif" title="Select" onclick="SendMsg('menu','move')">
+	<div id="zoomBut" class="menuBut" style="width:100px;height:3px; background-color:#666;vertical-align:6px;margin-left:20px;"></div>
+	<img id="editBut" class="menuBut" src="img/editbut.gif" title="Edit" onclick="SendMsg('menu','edit')">
+	<img id="viewBut" class="menuBut" src="img/viewbut.gif" title="View" onclick="SendMsg('menu','view')">
+	<img id="addBut"  class="menuBut" src="img/addbut.gif"  title="Add node" onclick="SendMsg('menu','add')">
+	<div style="float:right;margin-right:16px">
+			<img id="undoBut"  class="menuBut" src="img/undobut.gif"  title="Undo" onclick="SendMsg('menu','undo')">
+			<img id="redoBut"  class="menuBut" src="img/redobut.gif"  title="Redo" onclick="SendMsg('menu','redo')">
+			<img id="gearBut"  class="menuBut" src="img/gearbut.gif"  title="Settings" onclick="SendMsg('menu','setting')">
+	</div>
 </div>
 
 <script>
 
-var editMode=false;
+var selectMode=false;														// Assume we're in panning mode
 
 $(document).ready(function() {								           	// ON PAGE LOADED
-	
-	
-	
-	
+	$("#zoomBut").slider({ slide: function(e,ui) { SendMsg("zoom",ui.value); }});	// Zoom slider
 	if (window.addEventListener) 											// If supported this way
 		window.addEventListener("message",html5MessageHandler,false);		// Add event handler
 	else																	// Use other method
@@ -47,8 +55,10 @@ function html5MessageHandler(e)											// ON HTML5 MESSAGE
 	if (e && e.data) {														// If a valid message				
 		if (e.data.match(/QMap=menu/))										// A menu message
 			MenuOption(e.data.substr(10));									// Route
+		else if (e.data.match(/QMap=zoom/))									// A zoom message
+			trace("Zoom",e.data.substr(10));								// Route
 		else
-			trace(e.data);														// Handle it
+			trace(e.data);													
 		}
 }
 
@@ -60,9 +70,10 @@ function SendMsg(type, msg)												// SEND HTML5 MESSAGE
 function MenuOption(msg)												// ROUTE MENU OPTION
 {
 	if (msg == "move") {													// Move
-		editMode=!editMode;													// Toggle mode
-		$("#moveBut").prop("src", editMode ? "img/editbut.gif" : "img/movebut.gif"); // Toggle button
+		selectMode=!selectMode;												// Toggle mode
+		$("#moveBut").prop("src", selectMode ? "img/selectbut.gif" : "img/movebut.gif"); // Toggle button
 		}
+	trace("Menu",msg);
 }
 
 function trace(msg, p1, p2, p3, p4)										// CONSOLE 
